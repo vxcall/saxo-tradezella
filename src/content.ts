@@ -47,79 +47,118 @@ function ensurePanel(): HTMLElement {
   style.textContent = `
 #${PANEL_ID} {
   position: fixed;
-  right: 18px;
+  right: 20px;
   bottom: 80px;
   z-index: 999999;
   width: 360px;
-  background: #111827;
-  color: #f9fafb;
-  border: 2px dashed #60a5fa;
-  border-radius: 12px;
-  padding: 14px;
-  font: 600 13px/1.4 "Segoe UI", Tahoma, sans-serif;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  max-width: min(360px, calc(100vw - 32px));
+  background: #0b1220;
+  color: #e2e8f0;
+  border: 1px solid #1f2937;
+  border-radius: 14px;
+  padding: 16px;
+  font: 600 13px/1.5 "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.4);
   cursor: default;
-  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+#${PANEL_ID},
+#${PANEL_ID} * {
+  box-sizing: border-box;
 }
 #${PANEL_ID}.active {
-  border-color: #34d399;
-  background: #0f172a;
+  border-color: #38bdf8;
+  box-shadow: 0 18px 40px rgba(56, 189, 248, 0.15);
   transform: translateY(-4px);
 }
 #${PANEL_ID} .title {
-  font-size: 13px;
-  letter-spacing: 0.2px;
+  font-size: 14px;
+  letter-spacing: 0.3px;
 }
 #${PANEL_ID} .hint {
-  font-weight: 400;
-  color: #cbd5f5;
+  font-weight: 500;
+  color: #94a3b8;
   margin-top: 6px;
   font-size: 12px;
 }
 #${PANEL_ID} .status {
   font-weight: 600;
-  color: #fcd34d;
-  margin-top: 10px;
+  color: #fbbf24;
+  margin-top: 12px;
   font-size: 12px;
 }
 #${PANEL_ID} .status.ok {
-  color: #34d399;
+  color: #22c55e;
 }
 #${PANEL_ID} .status.error {
   color: #f87171;
 }
 #${PANEL_ID} .actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
 }
 #${PANEL_ID} button {
+  position: static !important;
   appearance: none;
-  border: 1px solid #475569;
-  background: #1f2937;
-  color: #f9fafb;
-  border-radius: 8px;
-  padding: 6px 10px;
+  border: 1px solid #334155;
+  background: #111827;
+  color: #f8fafc;
+  border-radius: 10px;
+  padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+}
+#${PANEL_ID} button:hover {
+  border-color: #60a5fa;
+  background: #1e293b;
+}
+#${PANEL_ID} button:active {
+  transform: translateY(1px);
+}
+#${PANEL_ID} button:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
 }
 #${PANEL_ID} button:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: not-allowed;
+  box-shadow: none;
+}
+#${PANEL_ID} #${UPLOAD_BUTTON_ID} {
+  background: #2563eb;
+  border-color: #1d4ed8;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+}
+#${PANEL_ID} #${UPLOAD_BUTTON_ID}:hover {
+  background: #1d4ed8;
+  border-color: #1e40af;
+}
+#${PANEL_ID} #${UPLOAD_BUTTON_ID}:disabled {
+  background: #1f2937;
+  border-color: #334155;
+  box-shadow: none;
 }
 #${PANEL_ID} .list {
-  margin-top: 10px;
-  max-height: 240px;
+  margin-top: 12px;
+  max-height: 220px;
   overflow: auto;
   border: 1px solid #1f2937;
-  border-radius: 8px;
-  background: #0b1220;
+  border-radius: 10px;
+  background: #0f172a;
 }
 #${PANEL_ID} .row {
   display: flex;
   gap: 8px;
-  padding: 6px 8px;
+  padding: 8px 10px;
   border-bottom: 1px solid #1f2937;
   align-items: center;
   font-weight: 500;
@@ -129,11 +168,16 @@ function ensurePanel(): HTMLElement {
   border-bottom: none;
 }
 #${PANEL_ID} .row button {
-  border-color: #ef4444;
-  background: transparent;
-  color: #f87171;
-  padding: 2px 6px;
+  border-color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+  padding: 2px 8px;
+  min-height: auto;
   font-size: 11px;
+}
+#${PANEL_ID} .row button:hover {
+  border-color: #fb7185;
+  background: rgba(248, 113, 113, 0.2);
 }
 #${PANEL_ID} .row-text {
   color: #e2e8f0;
