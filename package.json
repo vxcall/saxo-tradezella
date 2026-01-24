@@ -1,0 +1,17 @@
+{
+  "name": "saxo-tradezella-extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome extension to convert Saxo trades into Tradezella generic CSV.",
+  "scripts": {
+    "build": "esbuild src/content.ts --bundle --outfile=dist/content.js --format=iife --target=es2020 --minify",
+    "build:dev": "esbuild src/content.ts --bundle --outfile=dist/content.js --format=iife --target=es2020 --sourcemap"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0",
+    "typescript": "^5.4.5"
+  }
+}

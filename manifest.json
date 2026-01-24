@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Saxo to Tradezella Uploader",
+  "version": "0.1.0",
+  "description": "Drag and drop Saxo trade history to auto-fill Tradezella generic CSV upload.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://app.tradezella.com/ftux-add-trade/generic/upload",
+        "https://app.tradezella.com/tracking/add-trade/file_upload*"
+      ],
+      "js": ["dist/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "host_permissions": [
+    "https://app.tradezella.com/ftux-add-trade/generic/upload",
+    "https://app.tradezella.com/tracking/add-trade/file_upload*"
+  ]
+}
