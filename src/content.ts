@@ -94,10 +94,15 @@ function ensurePanel(): HTMLElement {
   color: #f87171;
 }
 #${PANEL_ID} .actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 12px;
+  position: static !important;
+}
+#${PANEL_ID} .actions button {
+  min-width: 0;
+  width: 100%;
 }
 #${PANEL_ID} button {
   position: static !important;
