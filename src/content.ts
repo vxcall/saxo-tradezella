@@ -48,7 +48,7 @@ function ensurePanel(): HTMLElement {
 #${PANEL_ID} {
   position: fixed;
   right: 18px;
-  bottom: 18px;
+  bottom: 80px;
   z-index: 999999;
   width: 360px;
   background: #111827;
