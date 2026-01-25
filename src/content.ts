@@ -28,6 +28,10 @@ const LIST_ID = 'tradezella-saxo-row-list';
 const SELECT_BUTTON_ID = 'tradezella-saxo-select';
 const UPLOAD_BUTTON_ID = 'tradezella-saxo-upload';
 const UPLOAD_SELECTOR = 'input[name="fileUpload"][type="file"]';
+const TARGET_PATHS = [
+  '/ftux-add-trade/generic/upload',
+  '/tracking/add-trade/file_upload',
+];
 
 const SPREAD_BY_ASSET_TYPE: Record<string, string> = {
   FxSpot: 'Stock',
@@ -36,6 +40,10 @@ const SPREAD_BY_ASSET_TYPE: Record<string, string> = {
 
 let currentRows: string[][] = [];
 let currentSourceName = '';
+let panelReady = false;
+let panelEl: HTMLElement | null = null;
+let routeWatcherStarted = false;
+let lastUrl = window.location.href;
 
 function ensurePanel(): HTMLElement {
   const existing = document.getElementById(PANEL_ID);
@@ -209,6 +217,58 @@ function ensurePanel(): HTMLElement {
   document.documentElement.appendChild(panel);
 
   return panel;
+}
+
+function normalizePath(path: string): string {
+  if (path.length > 1 && path.endsWith('/')) {
+    return path.slice(0, -1);
+  }
+  return path;
+}
+
+function isTargetPath(pathname: string): boolean {
+  const path = normalizePath(pathname);
+  return TARGET_PATHS.some((target) => path === target || path.startsWith(`${target}/`));
+}
+
+function ensurePanelReady() {
+  if (!panelEl) {
+    panelEl = ensurePanel();
+  }
+  if (!panelReady) {
+    setupDropZone(panelEl);
+    renderRows();
+    panelReady = true;
+  }
+}
+
+function updatePanelVisibility() {
+  lastUrl = window.location.href;
+  const shouldShow = isTargetPath(window.location.pathname);
+  if (shouldShow) {
+    ensurePanelReady();
+    if (panelEl) {
+      panelEl.style.display = '';
+    }
+  } else if (panelEl) {
+    panelEl.style.display = 'none';
+  }
+}
+
+function startRouteWatcher() {
+  if (routeWatcherStarted) return;
+  routeWatcherStarted = true;
+
+  updatePanelVisibility();
+
+  window.addEventListener('popstate', updatePanelVisibility);
+  window.addEventListener('hashchange', updatePanelVisibility);
+
+  window.setInterval(() => {
+    if (window.location.href !== lastUrl) {
+      updatePanelVisibility();
+    }
+  }, 500);
 }
 
 function setStatus(message: string, state: 'ok' | 'error' | 'info' = 'info') {
@@ -638,9 +698,7 @@ async function uploadCurrentRows() {
 }
 
 function init() {
-  const panel = ensurePanel();
-  setupDropZone(panel);
-  renderRows();
+  startRouteWatcher();
 }
 
 if (document.readyState === 'loading') {

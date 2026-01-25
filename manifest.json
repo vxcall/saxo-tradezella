@@ -6,15 +6,13 @@
   "content_scripts": [
     {
       "matches": [
-        "https://app.tradezella.com/ftux-add-trade/generic/upload",
-        "https://app.tradezella.com/tracking/add-trade/file_upload*"
+        "https://app.tradezella.com/*"
       ],
       "js": ["dist/content.js"],
       "run_at": "document_idle"
     }
   ],
   "host_permissions": [
-    "https://app.tradezella.com/ftux-add-trade/generic/upload",
-    "https://app.tradezella.com/tracking/add-trade/file_upload*"
+    "https://app.tradezella.com/*"
   ]
 }
