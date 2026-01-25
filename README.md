@@ -19,6 +19,12 @@ This extension converts Saxo Bank trade history Excel files into Tradezella's `g
 
 ## Usage
 
+- Go to Saxo trader go and click "資産管理" tab then click "「口座管理」に戻す" link
+<img width="923" height="319" alt="image" src="https://github.com/user-attachments/assets/413ef8a3-b390-42b1-8e8b-28c0aa45ffb9" />
+
+- After that open "取引履歴" and export trade history as exel file.
+<img width="400" height="232" alt="image" src="https://github.com/user-attachments/assets/8f69fd17-3833-4941-9948-f1f505a4ec5c" />
+
 - Visit Tradezella and open the import page.
 - Drag and drop a Saxo `.xlsx` file onto the bottom-right panel.
 - The extension converts it to the generic CSV, then lets you delete rows that you wanna exclude.
