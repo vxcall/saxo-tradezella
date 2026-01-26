@@ -25,7 +25,7 @@ Tradezellaでトレードのジャーナルを書きたいけどサクソバン�
 - 続いて「取引履歴」を開き、取引履歴を Excel ファイルとしてエクスポート。
 <img width="400" height="232" alt="image" src="https://github.com/user-attachments/assets/8f69fd17-3833-4941-9948-f1f505a4ec5c" />
 
-### Tradezellaで拡張機能を使う
+### Tradezellaでデータのアップロード
 
 - TradezellaにアクセスしてFile Uploadのページを開く。
 - すると右下にパネルがでてくるので、そこにサクソバンク証券でダウンロードした `.xlsx` ファイルをドラッグ＆ドロップ。
@@ -37,3 +37,5 @@ Tradezellaでトレードのジャーナルを書きたいけどサクソバン�
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/bb6b9889-c53f-4cde-ad74-570ebbd69762" />
 
 - Upload CSVボタンを押すとそのままアップロードしてくれます。
+
+### Happy Journaling Days!
