@@ -8,10 +8,10 @@
     "build:dev": "esbuild src/content.ts --bundle --outfile=dist/content.js --format=iife --target=es2020 --sourcemap"
   },
   "dependencies": {
-    "xlsx": "^0.18.5"
+    "read-excel-file": "^6.0.1"
   },
   "devDependencies": {
-    "esbuild": "^0.20.0",
+    "esbuild": "^0.27.2",
     "typescript": "^5.4.5"
   }
 }

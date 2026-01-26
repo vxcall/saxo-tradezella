@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import readXlsxFile, { readSheetNames } from 'read-excel-file';
 
 type Row = Record<string, unknown>;
 
@@ -283,7 +283,7 @@ function setStatus(message: string, state: 'ok' | 'error' | 'info' = 'info') {
 function setupDropZone(panel: HTMLElement) {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
-  fileInput.accept = '.xlsx,.xls';
+  fileInput.accept = '.xlsx';
   fileInput.style.display = 'none';
   panel.appendChild(fileInput);
 
@@ -343,7 +343,7 @@ function setupDropZone(panel: HTMLElement) {
 }
 
 async function handleFile(file: File) {
-  if (!file.name.toLowerCase().match(/\.xls(x)?$/)) {
+  if (!file.name.toLowerCase().match(/\.xlsx$/)) {
     setStatus('Please drop a .xlsx file.', 'error');
     return;
   }
@@ -351,24 +351,19 @@ async function handleFile(file: File) {
   setStatus('Reading file...');
 
   try {
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-
+    const sheetNames = await readSheetNames(file);
     const sheetName =
-      workbook.SheetNames.find((name) => name === 'TradesWithAdditionalInfo') ||
-      workbook.SheetNames.find((name) => name === 'Trades') ||
-      workbook.SheetNames[0];
+      sheetNames.find((name) => name === 'TradesWithAdditionalInfo') ||
+      sheetNames.find((name) => name === 'Trades') ||
+      sheetNames[0];
 
     if (!sheetName) {
       setStatus('No sheet found in workbook.', 'error');
       return;
     }
 
-    const sheet = workbook.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json<Row>(sheet, {
-      defval: '',
-      raw: true,
-    });
+    const sheetRows = await readXlsxFile(file, { sheet: sheetName });
+    const rows = buildRowsFromSheet(sheetRows);
 
     if (rows.length === 0) {
       setStatus('Sheet has no rows.', 'error');
@@ -503,9 +498,7 @@ function parseDateTime(value: unknown): Date | null {
   }
 
   if (typeof value === 'number') {
-    const parsed = XLSX.SSF.parse_date_code(value);
-    if (!parsed) return null;
-    return new Date(parsed.y, parsed.m - 1, parsed.d, parsed.H, parsed.M, parsed.S);
+    return parseExcelSerialDate(value);
   }
 
   if (typeof value === 'string') {
@@ -531,6 +524,32 @@ function parseDateTime(value: unknown): Date | null {
   }
 
   return null;
+}
+
+function parseExcelSerialDate(value: number): Date | null {
+  if (!Number.isFinite(value)) return null;
+  const base = new Date(1899, 11, 30);
+  const ms = Math.round(value * 24 * 60 * 60 * 1000);
+  return new Date(base.getTime() + ms);
+}
+
+function buildRowsFromSheet(rows: unknown[][]): Row[] {
+  if (rows.length === 0) return [];
+  const headerRow = rows[0] ?? [];
+  const headers = headerRow.map((cell) => (cell === null || cell === undefined ? '' : String(cell).trim()));
+  const mappedRows: Row[] = [];
+
+  for (const row of rows.slice(1)) {
+    const record: Row = {};
+    headers.forEach((header, index) => {
+      if (!header) return;
+      const cell = row?.[index];
+      record[header] = cell === null || cell === undefined ? '' : cell;
+    });
+    mappedRows.push(record);
+  }
+
+  return mappedRows;
 }
 
 function formatDate(date: Date): string {
