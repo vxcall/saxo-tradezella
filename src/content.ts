@@ -29,6 +29,7 @@ const SELECT_BUTTON_ID = 'tradezella-saxo-select';
 const UPLOAD_BUTTON_ID = 'tradezella-saxo-upload';
 const DOWNLOAD_BUTTON_ID = 'tradezella-saxo-download';
 const DROPZONE_ID = 'tradezella-saxo-dropzone';
+const BACK_BUTTON_ID = 'tradezella-saxo-back';
 const UPLOAD_SELECTOR = 'input[name="fileUpload"][type="file"]';
 const TARGET_PATHS = [
   '/ftux-add-trade/generic/upload',
@@ -86,6 +87,25 @@ function ensurePanel(): HTMLElement {
   font-size: 13.5px;
   letter-spacing: 0.4px;
   text-transform: uppercase;
+}
+#${PANEL_ID} .header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#${PANEL_ID} #${BACK_BUTTON_ID} {
+  width: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 14px;
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(100, 116, 139, 0.5);
+  display: none;
+}
+#${PANEL_ID} #${BACK_BUTTON_ID}:hover {
+  border-color: rgba(148, 163, 184, 0.9);
+  background: rgba(51, 65, 85, 0.9);
 }
 #${PANEL_ID} .hint {
   font-weight: 500;
@@ -260,7 +280,10 @@ function ensurePanel(): HTMLElement {
   const panel = document.createElement('div');
   panel.id = PANEL_ID;
   panel.innerHTML = `
-    <div class="title">Saxo .xlsx to Tradezella CSV</div>
+    <div class="header">
+      <button type="button" id="${BACK_BUTTON_ID}" aria-label="Go back">←</button>
+      <div class="title">Saxo .xlsx to Tradezella CSV</div>
+    </div>
     <div class="hint">Drop a file here or pick one to preview rows.</div>
     <div class="dropzone" id="${DROPZONE_ID}">
       Drag & drop your .xlsx file here
@@ -356,8 +379,9 @@ function setupDropZone(panel: HTMLElement) {
   const downloadButton = panel.querySelector<HTMLButtonElement>(`#${DOWNLOAD_BUTTON_ID}`);
   const list = panel.querySelector<HTMLDivElement>(`#${LIST_ID}`);
   const dropzone = panel.querySelector<HTMLDivElement>(`#${DROPZONE_ID}`);
+  const backButton = panel.querySelector<HTMLButtonElement>(`#${BACK_BUTTON_ID}`);
 
-  if (!selectButton || !uploadButton || !downloadButton || !list || !dropzone) {
+  if (!selectButton || !uploadButton || !downloadButton || !list || !dropzone || !backButton) {
     return;
   }
 
@@ -377,6 +401,14 @@ function setupDropZone(panel: HTMLElement) {
 
   downloadButton.addEventListener('click', () => {
     downloadCurrentRows();
+  });
+
+  backButton.addEventListener('click', () => {
+    fileInput.value = '';
+    currentRows = [];
+    currentSourceName = '';
+    renderRows();
+    updateStatusAfterEdit();
   });
 
   list.addEventListener('click', (event) => {
@@ -766,10 +798,12 @@ function updateStatusAfterEdit() {
 function updateEmptyState() {
   const list = document.getElementById(LIST_ID);
   const dropzone = document.getElementById(DROPZONE_ID);
+  const backButton = document.getElementById(BACK_BUTTON_ID);
   if (!list || !dropzone) return;
   const hasRows = currentRows.length > 0;
   dropzone.style.display = hasRows ? 'none' : 'flex';
   list.style.display = hasRows ? '' : 'none';
+  if (backButton) backButton.style.display = hasRows ? 'inline-flex' : 'none';
 }
 
 function downloadCurrentRows() {
