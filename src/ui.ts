@@ -50,8 +50,9 @@ export function renderRows(rows: string[][]): void {
     dropzoneEl = document.getElementById(DROPZONE_ID) as HTMLDivElement | null;
   }
   if (!listEl || !dropzoneEl) return;
+  const list = listEl;
 
-  listEl.innerHTML = '';
+  list.innerHTML = '';
   if (rows.length === 0) {
     updateEmptyState(rows.length);
     return;
@@ -73,7 +74,7 @@ export function renderRows(rows: string[][]): void {
 
     item.appendChild(remove);
     item.appendChild(text);
-    listEl.appendChild(item);
+    list.appendChild(item);
   });
 
   updateEmptyState(rows.length);
@@ -376,13 +377,13 @@ function ensurePanel(): HTMLElement {
       Drag & drop your .xlsx file here
       <span>TradesWithAdditionalInfo / Trades supported</span>
     </div>
+    <div class="status" id="${STATUS_ID}"></div>
+    <div class="list" id="${LIST_ID}"></div>
     <div class="actions">
       <button type="button" id="${SELECT_BUTTON_ID}">Select File</button>
       <button type="button" id="${UPLOAD_BUTTON_ID}" disabled>Upload CSV</button>
       <button type="button" id="${DOWNLOAD_BUTTON_ID}" disabled>Download CSV</button>
     </div>
-    <div class="status" id="${STATUS_ID}"></div>
-    <div class="list" id="${LIST_ID}"></div>
   `;
 
   document.documentElement.appendChild(style);
@@ -404,10 +405,15 @@ function setupDropZone(panel: HTMLElement, handlers: PanelHandlers): void {
   listEl = panel.querySelector<HTMLDivElement>(`#${LIST_ID}`);
   dropzoneEl = panel.querySelector<HTMLDivElement>(`#${DROPZONE_ID}`);
   backButton = panel.querySelector<HTMLButtonElement>(`#${BACK_BUTTON_ID}`);
+  const hintEl = panel.querySelector<HTMLDivElement>('.hint');
 
-  if (!selectButton || !uploadButton || !downloadButton || !listEl || !dropzoneEl || !backButton || !fileInput) {
+  if (!selectButton || !uploadButton || !downloadButton || !listEl || !dropzoneEl || !backButton || !fileInput || !hintEl) {
     return;
   }
+
+  const setHintVisible = (visible: boolean) => {
+    hintEl.style.display = visible ? '' : 'none';
+  };
 
   selectButton.addEventListener('click', () => {
     if (!fileInput) return;
@@ -433,6 +439,7 @@ function setupDropZone(panel: HTMLElement, handlers: PanelHandlers): void {
     if (fileInput) {
       fileInput.value = '';
     }
+    setHintVisible(true);
     handlers.onBack();
   });
 
@@ -449,6 +456,7 @@ function setupDropZone(panel: HTMLElement, handlers: PanelHandlers): void {
   fileInput.addEventListener('change', () => {
     const file = fileInput?.files?.[0];
     if (file) {
+      setHintVisible(false);
       handlers.onFileSelected(file);
     }
   });
@@ -467,6 +475,7 @@ function setupDropZone(panel: HTMLElement, handlers: PanelHandlers): void {
     panel.classList.remove('active');
     const file = event.dataTransfer?.files?.[0];
     if (file) {
+      setHintVisible(false);
       handlers.onFileSelected(file);
     }
   });
