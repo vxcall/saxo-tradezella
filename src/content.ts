@@ -127,7 +127,7 @@ function ensurePanel(): HTMLElement {
 }
 #${PANEL_ID} .actions {
   display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 10px;
   margin-top: 12px;
   position: static !important;
@@ -185,17 +185,18 @@ function ensurePanel(): HTMLElement {
   box-shadow: none;
 }
 #${PANEL_ID} #${DOWNLOAD_BUTTON_ID} {
-  background: linear-gradient(135deg, #10b981, #059669);
-  border-color: rgba(16, 185, 129, 0.9);
-  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.22);
+  background: rgba(30, 41, 59, 0.75);
+  border-color: rgba(148, 163, 184, 0.55);
+  box-shadow: none;
 }
 #${PANEL_ID} #${DOWNLOAD_BUTTON_ID}:hover {
-  background: linear-gradient(135deg, #059669, #047857);
-  border-color: rgba(5, 150, 105, 0.9);
+  background: rgba(51, 65, 85, 0.9);
+  border-color: rgba(148, 163, 184, 0.9);
 }
 #${PANEL_ID} #${DOWNLOAD_BUTTON_ID}:disabled {
   background: #1f2937;
   border-color: #334155;
+  color: #94a3b8;
   box-shadow: none;
 }
 #${PANEL_ID} .dropzone {
@@ -272,7 +273,7 @@ function ensurePanel(): HTMLElement {
     bottom: 72px;
   }
   #${PANEL_ID} .actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   }
 }
 `;
@@ -780,10 +781,20 @@ function formatRowDisplay(row: string[]): string {
 }
 
 function updateActionButtons() {
+  const selectButton = document.getElementById(SELECT_BUTTON_ID) as HTMLButtonElement | null;
   const uploadButton = document.getElementById(UPLOAD_BUTTON_ID) as HTMLButtonElement | null;
   const downloadButton = document.getElementById(DOWNLOAD_BUTTON_ID) as HTMLButtonElement | null;
-  if (uploadButton) uploadButton.disabled = currentRows.length === 0;
-  if (downloadButton) downloadButton.disabled = currentRows.length === 0;
+  const hasRows = currentRows.length > 0;
+
+  if (selectButton) selectButton.style.display = hasRows ? 'none' : '';
+  if (uploadButton) {
+    uploadButton.style.display = hasRows ? '' : 'none';
+    uploadButton.disabled = !hasRows;
+  }
+  if (downloadButton) {
+    downloadButton.style.display = hasRows ? '' : 'none';
+    downloadButton.disabled = !hasRows;
+  }
 }
 
 function updateStatusAfterEdit() {
@@ -804,6 +815,7 @@ function updateEmptyState() {
   dropzone.style.display = hasRows ? 'none' : 'flex';
   list.style.display = hasRows ? '' : 'none';
   if (backButton) backButton.style.display = hasRows ? 'inline-flex' : 'none';
+  updateActionButtons();
 }
 
 function downloadCurrentRows() {
