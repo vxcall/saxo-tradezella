@@ -27,6 +27,7 @@ const STATUS_ID = 'tradezella-saxo-drop-status';
 const LIST_ID = 'tradezella-saxo-row-list';
 const SELECT_BUTTON_ID = 'tradezella-saxo-select';
 const UPLOAD_BUTTON_ID = 'tradezella-saxo-upload';
+const DOWNLOAD_BUTTON_ID = 'tradezella-saxo-download';
 const UPLOAD_SELECTOR = 'input[name="fileUpload"][type="file"]';
 const TARGET_PATHS = [
   '/ftux-add-trade/generic/upload',
@@ -60,13 +61,14 @@ function ensurePanel(): HTMLElement {
   z-index: 999999;
   width: 360px;
   max-width: min(360px, calc(100vw - 32px));
-  background: #0b1220;
+  background: linear-gradient(145deg, rgba(12, 20, 36, 0.98), rgba(15, 23, 42, 0.98));
   color: #e2e8f0;
-  border: 1px solid #1f2937;
-  border-radius: 14px;
-  padding: 16px;
-  font: 600 13px/1.5 "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(71, 85, 105, 0.45);
+  border-radius: 18px;
+  padding: 16px 16px 14px;
+  font: 600 12.5px/1.5 "Space Grotesk", "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(6px);
   cursor: default;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -75,13 +77,14 @@ function ensurePanel(): HTMLElement {
   box-sizing: border-box;
 }
 #${PANEL_ID}.active {
-  border-color: #38bdf8;
-  box-shadow: 0 18px 40px rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.8);
+  box-shadow: 0 22px 48px rgba(56, 189, 248, 0.2);
   transform: translateY(-4px);
 }
 #${PANEL_ID} .title {
-  font-size: 14px;
-  letter-spacing: 0.3px;
+  font-size: 13.5px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
 }
 #${PANEL_ID} .hint {
   font-weight: 500;
@@ -103,7 +106,7 @@ function ensurePanel(): HTMLElement {
 }
 #${PANEL_ID} .actions {
   display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-top: 12px;
   position: static !important;
@@ -115,10 +118,10 @@ function ensurePanel(): HTMLElement {
 #${PANEL_ID} button {
   position: static !important;
   appearance: none;
-  border: 1px solid #334155;
-  background: #111827;
+  border: 1px solid rgba(100, 116, 139, 0.6);
+  background: rgba(15, 23, 42, 0.9);
   color: #f8fafc;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -131,8 +134,8 @@ function ensurePanel(): HTMLElement {
   transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
 }
 #${PANEL_ID} button:hover {
-  border-color: #60a5fa;
-  background: #1e293b;
+  border-color: rgba(96, 165, 250, 0.9);
+  background: rgba(30, 41, 59, 0.9);
 }
 #${PANEL_ID} button:active {
   transform: translateY(1px);
@@ -147,15 +150,29 @@ function ensurePanel(): HTMLElement {
   box-shadow: none;
 }
 #${PANEL_ID} #${UPLOAD_BUTTON_ID} {
-  background: #2563eb;
-  border-color: #1d4ed8;
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: rgba(37, 99, 235, 0.9);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
 }
 #${PANEL_ID} #${UPLOAD_BUTTON_ID}:hover {
-  background: #1d4ed8;
-  border-color: #1e40af;
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  border-color: rgba(30, 64, 175, 0.9);
 }
 #${PANEL_ID} #${UPLOAD_BUTTON_ID}:disabled {
+  background: #1f2937;
+  border-color: #334155;
+  box-shadow: none;
+}
+#${PANEL_ID} #${DOWNLOAD_BUTTON_ID} {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: rgba(16, 185, 129, 0.9);
+  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.22);
+}
+#${PANEL_ID} #${DOWNLOAD_BUTTON_ID}:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  border-color: rgba(5, 150, 105, 0.9);
+}
+#${PANEL_ID} #${DOWNLOAD_BUTTON_ID}:disabled {
   background: #1f2937;
   border-color: #334155;
   box-shadow: none;
@@ -164,9 +181,9 @@ function ensurePanel(): HTMLElement {
   margin-top: 12px;
   max-height: 220px;
   overflow: auto;
-  border: 1px solid #1f2937;
-  border-radius: 10px;
-  background: #0f172a;
+  border: 1px solid rgba(51, 65, 85, 0.65);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.85);
 }
 #${PANEL_ID} .row {
   display: flex;
@@ -182,7 +199,7 @@ function ensurePanel(): HTMLElement {
 }
 #${PANEL_ID} .row button {
   border-color: #f87171;
-  background: rgba(248, 113, 113, 0.12);
+  background: rgba(248, 113, 113, 0.14);
   color: #fca5a5;
   padding: 2px 8px;
   min-height: auto;
@@ -198,6 +215,15 @@ function ensurePanel(): HTMLElement {
   flex: 1;
   word-break: break-word;
 }
+@media (max-width: 420px) {
+  #${PANEL_ID} {
+    right: 12px;
+    bottom: 72px;
+  }
+  #${PANEL_ID} .actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 `;
 
   const panel = document.createElement('div');
@@ -208,6 +234,7 @@ function ensurePanel(): HTMLElement {
     <div class="actions">
       <button type="button" id="${SELECT_BUTTON_ID}">Select File</button>
       <button type="button" id="${UPLOAD_BUTTON_ID}" disabled>Upload CSV</button>
+      <button type="button" id="${DOWNLOAD_BUTTON_ID}" disabled>Download CSV</button>
     </div>
     <div class="status" id="${STATUS_ID}">Waiting for file...</div>
     <div class="list" id="${LIST_ID}"></div>
@@ -289,9 +316,10 @@ function setupDropZone(panel: HTMLElement) {
 
   const selectButton = panel.querySelector<HTMLButtonElement>(`#${SELECT_BUTTON_ID}`);
   const uploadButton = panel.querySelector<HTMLButtonElement>(`#${UPLOAD_BUTTON_ID}`);
+  const downloadButton = panel.querySelector<HTMLButtonElement>(`#${DOWNLOAD_BUTTON_ID}`);
   const list = panel.querySelector<HTMLDivElement>(`#${LIST_ID}`);
 
-  if (!selectButton || !uploadButton || !list) {
+  if (!selectButton || !uploadButton || !downloadButton || !list) {
     return;
   }
 
@@ -302,6 +330,10 @@ function setupDropZone(panel: HTMLElement) {
 
   uploadButton.addEventListener('click', () => {
     void uploadCurrentRows();
+  });
+
+  downloadButton.addEventListener('click', () => {
+    downloadCurrentRows();
   });
 
   list.addEventListener('click', (event) => {
@@ -381,7 +413,7 @@ async function handleFile(file: File) {
       setStatus('No mappable rows found.', 'error');
       currentRows = [];
       renderRows();
-      updateUploadButton();
+      updateActionButtons();
       return;
     }
 
@@ -676,19 +708,41 @@ function formatRowDisplay(row: string[]): string {
   return row.join(' | ');
 }
 
-function updateUploadButton() {
-  const button = document.getElementById(UPLOAD_BUTTON_ID) as HTMLButtonElement | null;
-  if (!button) return;
-  button.disabled = currentRows.length === 0;
+function updateActionButtons() {
+  const uploadButton = document.getElementById(UPLOAD_BUTTON_ID) as HTMLButtonElement | null;
+  const downloadButton = document.getElementById(DOWNLOAD_BUTTON_ID) as HTMLButtonElement | null;
+  if (uploadButton) uploadButton.disabled = currentRows.length === 0;
+  if (downloadButton) downloadButton.disabled = currentRows.length === 0;
 }
 
 function updateStatusAfterEdit() {
-  updateUploadButton();
+  updateActionButtons();
   if (currentRows.length === 0) {
     setStatus('No rows loaded.', 'info');
     return;
   }
-  setStatus(`Ready to upload ${currentRows.length} rows.`, 'ok');
+  setStatus(`Ready to upload or download ${currentRows.length} rows.`, 'ok');
+}
+
+function downloadCurrentRows() {
+  if (currentRows.length === 0) {
+    setStatus('No rows to download.', 'error');
+    return;
+  }
+
+  const csv = buildCsvFromMappedRows(currentRows);
+  const filename = buildCsvFilename(currentSourceName || 'saxo_trades');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+
+  setStatus(`Downloaded ${filename}`, 'ok');
 }
 
 async function uploadCurrentRows() {
