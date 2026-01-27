@@ -28,6 +28,7 @@ const LIST_ID = 'tradezella-saxo-row-list';
 const SELECT_BUTTON_ID = 'tradezella-saxo-select';
 const UPLOAD_BUTTON_ID = 'tradezella-saxo-upload';
 const DOWNLOAD_BUTTON_ID = 'tradezella-saxo-download';
+const DROPZONE_ID = 'tradezella-saxo-dropzone';
 const UPLOAD_SELECTOR = 'input[name="fileUpload"][type="file"]';
 const TARGET_PATHS = [
   '/ftux-add-trade/generic/upload',
@@ -177,6 +178,36 @@ function ensurePanel(): HTMLElement {
   border-color: #334155;
   box-shadow: none;
 }
+#${PANEL_ID} .dropzone {
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1.5px dashed rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.7);
+  color: #cbd5f5;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+#${PANEL_ID} .dropzone span {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+#${PANEL_ID} .dropzone:hover {
+  border-color: rgba(96, 165, 250, 0.7);
+  background: rgba(30, 41, 59, 0.7);
+}
+#${PANEL_ID}.active .dropzone {
+  border-color: rgba(56, 189, 248, 0.85);
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.35);
+  background: rgba(15, 23, 42, 0.9);
+}
 #${PANEL_ID} .list {
   margin-top: 12px;
   max-height: 220px;
@@ -231,12 +262,16 @@ function ensurePanel(): HTMLElement {
   panel.innerHTML = `
     <div class="title">Saxo .xlsx to Tradezella CSV</div>
     <div class="hint">Drop a file here or pick one to preview rows.</div>
+    <div class="dropzone" id="${DROPZONE_ID}">
+      Drag & drop your .xlsx file here
+      <span>TradesWithAdditionalInfo / Trades supported</span>
+    </div>
     <div class="actions">
       <button type="button" id="${SELECT_BUTTON_ID}">Select File</button>
       <button type="button" id="${UPLOAD_BUTTON_ID}" disabled>Upload CSV</button>
       <button type="button" id="${DOWNLOAD_BUTTON_ID}" disabled>Download CSV</button>
     </div>
-    <div class="status" id="${STATUS_ID}">Waiting for file...</div>
+    <div class="status" id="${STATUS_ID}"></div>
     <div class="list" id="${LIST_ID}"></div>
   `;
 
@@ -265,6 +300,7 @@ function ensurePanelReady() {
   if (!panelReady) {
     setupDropZone(panelEl);
     renderRows();
+    setStatus('', 'info');
     panelReady = true;
   }
 }
@@ -305,6 +341,7 @@ function setStatus(message: string, state: 'ok' | 'error' | 'info' = 'info') {
   status.classList.remove('ok', 'error');
   if (state === 'ok') status.classList.add('ok');
   if (state === 'error') status.classList.add('error');
+  status.style.display = message ? '' : 'none';
 }
 
 function setupDropZone(panel: HTMLElement) {
@@ -318,12 +355,18 @@ function setupDropZone(panel: HTMLElement) {
   const uploadButton = panel.querySelector<HTMLButtonElement>(`#${UPLOAD_BUTTON_ID}`);
   const downloadButton = panel.querySelector<HTMLButtonElement>(`#${DOWNLOAD_BUTTON_ID}`);
   const list = panel.querySelector<HTMLDivElement>(`#${LIST_ID}`);
+  const dropzone = panel.querySelector<HTMLDivElement>(`#${DROPZONE_ID}`);
 
-  if (!selectButton || !uploadButton || !downloadButton || !list) {
+  if (!selectButton || !uploadButton || !downloadButton || !list || !dropzone) {
     return;
   }
 
   selectButton.addEventListener('click', () => {
+    fileInput.value = '';
+    fileInput.click();
+  });
+
+  dropzone.addEventListener('click', () => {
     fileInput.value = '';
     fileInput.click();
   });
@@ -674,13 +717,7 @@ function renderRows() {
 
   list.innerHTML = '';
   if (currentRows.length === 0) {
-    const empty = document.createElement('div');
-    empty.className = 'row';
-    const text = document.createElement('div');
-    text.className = 'row-text';
-    text.textContent = 'No rows loaded.';
-    empty.appendChild(text);
-    list.appendChild(empty);
+    updateEmptyState();
     return;
   }
 
@@ -702,6 +739,8 @@ function renderRows() {
     item.appendChild(text);
     list.appendChild(item);
   });
+
+  updateEmptyState();
 }
 
 function formatRowDisplay(row: string[]): string {
@@ -718,10 +757,19 @@ function updateActionButtons() {
 function updateStatusAfterEdit() {
   updateActionButtons();
   if (currentRows.length === 0) {
-    setStatus('No rows loaded.', 'info');
+    setStatus('', 'info');
     return;
   }
   setStatus(`Ready to upload or download ${currentRows.length} rows.`, 'ok');
+}
+
+function updateEmptyState() {
+  const list = document.getElementById(LIST_ID);
+  const dropzone = document.getElementById(DROPZONE_ID);
+  if (!list || !dropzone) return;
+  const hasRows = currentRows.length > 0;
+  dropzone.style.display = hasRows ? 'none' : 'flex';
+  list.style.display = hasRows ? '' : 'none';
 }
 
 function downloadCurrentRows() {
