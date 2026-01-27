@@ -34,6 +34,20 @@ function ensurePanelReadyWithHandlers() {
   }
 }
 
+function resetPanelState() {
+  if (currentRows.length === 0 && currentSourceName === '') {
+    renderRows([]);
+    setStatus('', 'info');
+    updateActionButtons(0);
+    return;
+  }
+  currentRows = [];
+  currentSourceName = '';
+  renderRows([]);
+  setStatus('', 'info');
+  updateActionButtons(0);
+}
+
 function updatePanelVisibility() {
   lastUrl = window.location.href;
   const shouldShow = isTargetPath(window.location.pathname);
@@ -44,6 +58,7 @@ function updatePanelVisibility() {
     }
   } else if (panelEl) {
     panelEl.style.display = 'none';
+    resetPanelState();
   }
 }
 
