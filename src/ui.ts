@@ -375,7 +375,7 @@ function ensurePanel(): HTMLElement {
     <div class="hint">Drop a file here or pick one to preview rows.</div>
     <div class="dropzone" id="${DROPZONE_ID}">
       Drag & drop your .xlsx file here
-      <span>TradesWithAdditionalInfo / Trades supported</span>
+      <span>TradesExecuted.xlsx supported</span>
     </div>
     <div class="status" id="${STATUS_ID}"></div>
     <div class="list" id="${LIST_ID}"></div>
