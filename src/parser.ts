@@ -1,5 +1,32 @@
 import { SPREAD_BY_ASSET_TYPE } from './constants';
 
+const SYMBOL_KEYS = ['Underlying Instrument Symbol', '銘柄コード', '銘柄名'];
+const DESCRIPTION_KEYS = ['Underlying Instrument Description', '銘柄名'];
+const DATE_TIME_KEYS = ['Trade Execution Time', '取引時間'];
+const SIDE_KEYS = ['売買タイプ', 'Direction'];
+const QUANTITY_KEYS = ['数量'];
+const PRICE_KEYS = ['価格'];
+const ASSET_TYPE_KEYS = ['Asset type'];
+const EXPIRY_KEYS = ['ExpiryDate'];
+const STRIKE_KEYS = ['ストライク'];
+const OPTION_TYPE_KEYS = ['Option Event Type'];
+
+const MONTH_FRAGMENT = '(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)';
+const MONTH_YEAR_REGEX = new RegExp(`${MONTH_FRAGMENT}[a-z]*\\s+\\d{4}`, 'i');
+const MONTH_CODE_REGEX = new RegExp(`${MONTH_FRAGMENT}\\d{2}`, 'i');
+
+const FUTURES_SYMBOL_RULES: Array<{
+  pattern: RegExp;
+  symbol: string;
+  microSymbol?: string;
+}> = [
+  { pattern: /(crude|wti|oil)/, symbol: 'CL', microSymbol: 'MCL' },
+  { pattern: /(natural gas|natgas|nat gas|henry hub)/, symbol: 'NG' },
+  { pattern: /(platinum|plat)/, symbol: 'PL' },
+  { pattern: /gold/, symbol: 'GC', microSymbol: 'MGC' },
+  { pattern: /(silver|silv)/, symbol: 'SI', microSymbol: 'SIL' },
+];
+
 type ParsedDateTime = {
   date: string;
   time: string;
@@ -32,18 +59,21 @@ export function mapRow(row: Row): string[] | null {
     return null;
   }
 
-  const symbol = pickValue(row, ['Underlying Instrument Symbol', '銘柄コード', '銘柄名']);
-  if (!symbol) {
+  const rawSymbol = pickValue(row, SYMBOL_KEYS);
+  if (!rawSymbol) {
     return null;
   }
 
-  const rawSide = pickValue(row, ['売買タイプ', 'Direction']);
-  const rawQuantity = pickNumber(row, ['数量']);
-  const rawPrice = pickNumber(row, ['価格']);
-  const assetType = pickValue(row, ['Asset type']);
-  const expiry = pickDate(row, ['ExpiryDate']);
-  const strike = pickValue(row, ['ストライク']);
-  const optionType = pickValue(row, ['Option Event Type']);
+  const rawSide = pickValue(row, SIDE_KEYS);
+  const rawQuantity = pickNumber(row, QUANTITY_KEYS);
+  const rawPrice = pickNumber(row, PRICE_KEYS);
+  const assetType = pickValue(row, ASSET_TYPE_KEYS);
+  const expiry = pickDate(row, EXPIRY_KEYS);
+  const strike = pickValue(row, STRIKE_KEYS);
+  const optionType = pickValue(row, OPTION_TYPE_KEYS);
+  const description = pickValue(row, DESCRIPTION_KEYS);
+
+  const symbol = normalizeSymbol(rawSymbol, assetType, description);
 
   const quantity = rawQuantity !== null ? Math.abs(rawQuantity) : null;
   const side = normalizeSide(rawSide, rawQuantity);
@@ -101,7 +131,7 @@ function pickDate(row: Row, keys: string[]): Date | null {
 }
 
 function pickDateTime(row: Row): ParsedDateTime | null {
-  const dateValue = pickDate(row, ['Trade Execution Time', '取引時間']);
+  const dateValue = pickDate(row, DATE_TIME_KEYS);
   if (!dateValue) return null;
   return {
     date: formatDate(dateValue),
@@ -199,6 +229,44 @@ function normalizeSpread(assetType: string, optionType: string, strike: string):
   if (optionType || sanitizeStrike(strike)) return 'Single';
   if (assetType && SPREAD_BY_ASSET_TYPE[assetType]) return SPREAD_BY_ASSET_TYPE[assetType];
   return 'Stock';
+}
+
+function normalizeSymbol(rawSymbol: string, assetType: string, description: string): string {
+  const text = `${rawSymbol} ${description}`.toLowerCase();
+
+  if (!isFuturesSymbol(rawSymbol, assetType, description)) {
+    return rawSymbol;
+  }
+
+  const isMicro = text.includes('micro');
+
+  for (const rule of FUTURES_SYMBOL_RULES) {
+    if (!rule.pattern.test(text)) continue;
+    if (isMicro && rule.microSymbol) return rule.microSymbol;
+    return rule.symbol;
+  }
+
+  return rawSymbol;
+}
+
+function isFuturesSymbol(rawSymbol: string, assetType: string, description: string): boolean {
+  if (/futures/i.test(assetType)) return true;
+  return (
+    hasMonthYear(rawSymbol) ||
+    hasMonthYear(description) ||
+    hasMonthCode(rawSymbol) ||
+    hasMonthCode(description)
+  );
+}
+
+function hasMonthYear(value: string): boolean {
+  if (!value) return false;
+  return MONTH_YEAR_REGEX.test(value);
+}
+
+function hasMonthCode(value: string): boolean {
+  if (!value) return false;
+  return MONTH_CODE_REGEX.test(value);
 }
 
 function sanitizeStrike(value: string): string {
