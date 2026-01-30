@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Saxo to Tradezella Uploader",
-  "version": "0.1.0",
-  "description": "Drag and drop Saxo trade history to auto-fill Tradezella generic CSV upload.",
+  "version": "0.1.1",
+  "description": "サクソバンク証券の取引履歴をTradezella形式のCSVに変換するChrome拡張機能です。",
   "content_scripts": [
     {
       "matches": [
